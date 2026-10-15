@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title>قائمة مهامي</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#52796f" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="مهامي" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background-color: #f1f5f0;
+        margin: 0 10px;
+      }
+      #head {
+        font-size: 40px;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #263832;
+      }
+      label {
+        font-size: 18px;
+        color: #263832;
+      }
+      #inputs input {
+        height: 25px;
+        width: 230px;
+        border-radius: 7px;
+        border: none;
+        padding: 3px;
+        margin-left: 5px;
+        background-color: #ffffff;
+        color: #263832;
+      }
+      #inputs input:focus {
+        outline: 2px solid #52796f;
+        outline-offset: 1px;
+      }
+      #inputs button {
+        height: 25px;
+        width: 60px;
+        margin-top: 5px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+      }
+      button:active {
+        scale: 0.9;
+      }
+      #current {
+        font-size: 28px;
+        margin-top: 8px;
+        color: #263832;
+      }
+      hr {
+        border: none;
+        border-top: 2px solid #a3b5a8;
+        margin-bottom: 7px;
+      }
+      .task {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: #d5ded7 solid 1px;
+        padding: 4px;
+        background-color: #fff;
+        border-radius: 6px;
+        height: 37px;
+        margin: 3px 0;
+        color: #263832;
+      }
+      .task p {
+        font-size: 17px;
+      }
+      .task button {
+        height: 27px;
+        width: 45px;
+        border-radius: 3px;
+      }
+      #alert {
+        color: #b42318;
+        margin: 2px;
+        font-size: 13px;
+      }
+      button {
+        background-color: #52796f;
+        color: #ffffff;
+        border: 1px solid #3d6258;
+        cursor: pointer;
+      }
+      #btns {
+        width: 140px;
+        display: flex;
+        justify-content: space-between;
+        padding: 3px;
+      }
+      #btns button {
+        width: 60px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 id="head">قائمة المهام</h2>
+    <hr />
+    <div id="inputs">
+      <label for="name">ادخل اسم المهمة</label><br />
+      <small id="alert"></small><br />
+      <input type="text" id="name" placeholder="اسم المهمة" />
+      <button id="enter">Enter</button>
+    </div>
+    <p id="current">المهام الحالية</p>
+    <div id="outputs"></div>
+    <script>
+      let newT = document.getElementById("name");
+      let enter = document.getElementById("enter");
+      let All = document.getElementById("outputs");
+      let alert = document.getElementById("alert");
+      let mode = "add";
+      let glopal;
+      //save data
+      let data;
+      if (localStorage.dataBase != null) {
+        data = JSON.parse(localStorage.dataBase);
+      } else {
+        data = [];
+      }
+      enter.onclick = function () {
+        if (newT.value.trim() != "") {
+          if (mode == "add") {
+            data.push(newT.value.trim());
+          } else {
+            data[glopal] = newT.value;
+            mode = "add";
+            enter.innerHTML = "Enter";
+          }
+
+          localStorage.setItem("dataBase", JSON.stringify(data));
+          newT.value = "";
+          show();
+        } else {
+          newT.style.border = "#B42318 solid 2px";
+          alert.innerHTML = `required field`;
+        }
+      };
+      show();
+      //show it
+      function show() {
+        All.innerHTML = "";
+        for (let i = 0; i < data.length; i++) {
+          All.innerHTML += `
+  <div class="task">
+    <p>${data[i]}</p>
+      <div id="btns">
+        <button onclick="edit(${i})">edit</button>
+        <button onclick="deleteT(${i})">done</button>
+      </div>
+  </div>`;
+        }
+      }
+      // deleting(done)
+      function deleteT(i) {
+        data.splice(i, 1);
+        localStorage.dataBase = JSON.stringify(data);
+        newT.value = "";
+        glopal = null;
+        enter.innerHTML = "Enter";
+        mode = "add";
+        show();
+      }
+      newT.onkeyup = function () {
+        newT.style.border = "none";
+        alert.innerHTML = "";
+      };
+      function edit(i) {
+        newT.value = data[i];
+        scrollTo(0, 0);
+        mode = "edit";
+        enter.innerHTML = "edit";
+        glopal = i;
+      }
+
+      // PWA: register service worker (works offline after first load)
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("sw.js").catch(function () {});
+        });
+      }
+    </script>
+  </body>
+</html>
