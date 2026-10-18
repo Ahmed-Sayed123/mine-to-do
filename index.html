@@ -182,11 +182,10 @@
       };
       function edit(i) {
         newT.value = data[i];
-        newT.focus();
-        scrollTo(0, 0);
         mode = "edit";
         enter.innerHTML = "edit";
         glopal = i;
+        newT.focus();
       }
 
       // PWA: register service worker (works offline after first load)
