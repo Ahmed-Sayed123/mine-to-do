@@ -185,7 +185,11 @@
         mode = "edit";
         enter.innerHTML = "edit";
         glopal = i;
-        newT.focus();
+
+        setTimeout(() => {
+          newT.focus();
+          newT.setSelectionRange(newT.value.length, newT.value.length);
+        }, 100);
       }
 
       // PWA: register service worker (works offline after first load)
