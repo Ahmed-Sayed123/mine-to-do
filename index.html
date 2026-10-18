@@ -182,6 +182,7 @@
       };
       function edit(i) {
         newT.value = data[i];
+        newT.focus();
         scrollTo(0, 0);
         mode = "edit";
         enter.innerHTML = "edit";
