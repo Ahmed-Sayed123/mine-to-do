@@ -74,17 +74,19 @@
       overflow-wrap: anywhere;
     }
 
+    /* المسافة بين edit و done */
     .buttons {
       display: flex;
-      gap: 5px;
+      gap: 8px;
       flex-shrink: 0;
     }
 
+    /* أزرار المهام */
     .task button {
-      height: 27px;
-      width: 45px;
+      height: 29px;
+      width: 50px;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
       color: white;
       cursor: pointer;
     }
@@ -97,6 +99,7 @@
       background: #bc4749;
     }
 
+    /* زر تغيير مكان المهمة */
     .drag-handle {
       display: flex;
       align-items: center;
@@ -121,6 +124,7 @@
       opacity: 0.45;
     }
 
+    /* رسالة حذف المهمة */
     #toast {
       position: fixed;
       bottom: 20px;
@@ -129,7 +133,7 @@
       padding: 10px 16px;
       background: #263832;
       color: white;
-      border-radius: 6px;
+      border-radius: 10px;
       font-size: 14px;
       opacity: 0;
       visibility: hidden;
@@ -167,14 +171,13 @@
     let dataBase = [];
     let toastTimer;
 
-    // قراءة المهام القديمة من localStorage
+    // قراءة المهام المحفوظة
     try {
       const savedData = JSON.parse(localStorage.getItem("dataBase"));
 
       if (Array.isArray(savedData)) {
         dataBase = savedData
           .map((task, index) => {
-            // دعم البيانات القديمة التي كانت نصوصًا
             if (typeof task === "string") {
               return {
                 id: `${Date.now()}-${index}`,
@@ -182,10 +185,7 @@
               };
             }
 
-            if (
-              task &&
-              typeof task.title === "string"
-            ) {
+            if (task && typeof task.title === "string") {
               return {
                 id: task.id ?? `${Date.now()}-${index}`,
                 title: task.title
@@ -204,6 +204,7 @@
       localStorage.setItem("dataBase", JSON.stringify(dataBase));
     }
 
+    // إظهار رسالة مؤقتة
     function showToast(message) {
       clearTimeout(toastTimer);
 
@@ -215,6 +216,7 @@
       }, 2500);
     }
 
+    // إضافة مهمة
     function addTask() {
       const title = newT.value.trim();
 
@@ -229,6 +231,7 @@
 
       saveData();
       show();
+
       newT.value = "";
       newT.focus();
     }
@@ -241,6 +244,7 @@
       }
     });
 
+    // تعديل مهمة
     function editTask(id) {
       const task = dataBase.find(item => item.id === id);
 
@@ -266,6 +270,7 @@
       show();
     }
 
+    // حذف مهمة
     function deleteTask(id) {
       const task = dataBase.find(item => item.id === id);
 
@@ -273,16 +278,17 @@
         return;
       }
 
-      const completedTitle = task.title;
+      const deletedTitle = task.title;
 
       dataBase = dataBase.filter(item => item.id !== id);
 
       saveData();
       show();
 
-      showToast(`تم حذف المهمة: ${completedTitle}`);
+      showToast(`تم حذف المهمة: ${deletedTitle}`);
     }
 
+    // عرض المهام
     function show() {
       All.replaceChildren();
 
@@ -291,15 +297,18 @@
         row.className = "task";
         row.dataset.id = task.id;
 
+        // زر السحب
         const handle = document.createElement("button");
         handle.className = "drag-handle";
         handle.type = "button";
         handle.textContent = "⋮⋮";
         handle.setAttribute("aria-label", "تغيير مكان المهمة");
 
+        // اسم المهمة
         const text = document.createElement("p");
         text.textContent = task.title;
 
+        // مجموعة الأزرار
         const buttons = document.createElement("div");
         buttons.className = "buttons";
 
@@ -323,7 +332,7 @@
 
         buttons.append(editButton, doneButton);
 
-        // في اتجاه RTL يظهر مقبض السحب قبل اسم المهمة
+        // في اتجاه RTL يظهر زر السحب قبل اسم المهمة
         row.append(handle, text, buttons);
 
         All.appendChild(row);
@@ -332,6 +341,7 @@
       });
     }
 
+    // سحب المهام لتغيير ترتيبها
     function setupDragging(handle, row) {
       handle.addEventListener("pointerdown", event => {
         if (event.button !== 0 && event.pointerType === "mouse") {
@@ -342,8 +352,6 @@
 
         const startY = event.clientY;
         let dragging = false;
-
-        const originalRows = [...All.querySelectorAll(".task")];
 
         function onMove(moveEvent) {
           const distance = Math.abs(moveEvent.clientY - startY);
@@ -357,18 +365,19 @@
             row.classList.add("dragging");
           }
 
-          const otherRows = [...All.querySelectorAll(".task:not(.dragging)")];
+          const otherRows = [
+            ...All.querySelectorAll(".task:not(.dragging)")
+          ];
 
           let closestRow = null;
           let closestDistance = Number.NEGATIVE_INFINITY;
 
           otherRows.forEach(otherRow => {
             const rect = otherRow.getBoundingClientRect();
-            const offset = moveEvent.clientY - (rect.top + rect.height / 2);
+            const offset =
+              moveEvent.clientY - (rect.top + rect.height / 2);
 
-            if (
-              (offset < 0 && offset > closestDistance)
-            ) {
+            if (offset < 0 && offset > closestDistance) {
               closestDistance = offset;
               closestRow = otherRow;
             }
@@ -389,8 +398,9 @@
           row.classList.remove("dragging");
 
           if (dragging) {
-            const newOrder = [...All.querySelectorAll(".task")]
-              .map(item => item.dataset.id);
+            const newOrder = [
+              ...All.querySelectorAll(".task")
+            ].map(item => item.dataset.id);
 
             dataBase.sort((a, b) => {
               return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
@@ -413,10 +423,13 @@
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("sw.js")
           .catch(error => {
-            console.error("Service Worker registration failed:", error);
+            console.error(
+              "Service Worker registration failed:",
+              error
+            );
           });
       });
     }
   </script>
 </body>
-  </html>
+</html>
