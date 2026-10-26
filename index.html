@@ -1,562 +1,422 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <title>قائمة مهامي</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#52796f" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="icon" type="image/png" href="icon-192.png" />
-    <link rel="apple-touch-icon" href="icon-192.png" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="مهامي" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#52796f">
 
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+  <title>قائمة مهامي</title>
 
-      body {
-        background-color: #f1f5f0;
-        margin: 0 10px;
-      }
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
 
-      #head {
-        font-size: 40px;
-        margin-bottom: 7px;
-        font-weight: 600;
-        color: #263832;
-      }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-      label {
-        font-size: 18px;
-        color: #263832;
-      }
+    body {
+      margin: 0 10px;
+      background: #f1f5f0;
+      color: #263832;
+      font-family: Arial, sans-serif;
+    }
 
-      #inputs input {
-        height: 25px;
-        width: 230px;
-        border-radius: 7px;
-        border: none;
-        padding: 3px;
-        margin-left: 5px;
-        background-color: #ffffff;
-        color: #263832;
-      }
+    #head {
+      font-size: 40px;
+      text-align: center;
+    }
 
-      #inputs input:focus {
-        outline: 2px solid #52796f;
-        outline-offset: 1px;
-      }
+    #inputs {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
 
-      #inputs button {
-        height: 25px;
-        width: 60px;
-        margin-top: 5px;
-        border-radius: 5px;
-        margin-bottom: 15px;
-      }
+    #inputs input {
+      height: 25px;
+      width: 230px;
+      min-width: 0;
+      border: 1px solid #52796f;
+      border-radius: 6px;
+      padding: 3px 6px;
+    }
 
-      button:active {
-        scale: 0.9;
-      }
+    #inputs button {
+      height: 25px;
+      width: 60px;
+      border: none;
+      border-radius: 6px;
+      background: #52796f;
+      color: white;
+      cursor: pointer;
+    }
 
-      #current {
-        font-size: 28px;
-        margin-top: 8px;
-        color: #263832;
-      }
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
+      min-height: 37px;
+      margin: 3px 0;
+      padding: 4px;
+      background: white;
+      border: 1px solid #52796f;
+      border-radius: 6px;
+    }
 
-      hr {
-        border: none;
-        border-top: 2px solid #a3b5a8;
-        margin-bottom: 7px;
-      }
+    .task p {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      font-size: 17px;
+      overflow-wrap: anywhere;
+    }
 
-      .task {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 5px;
-        border: #d5ded7 solid 1px;
-        padding: 4px;
-        background-color: #fff;
-        border-radius: 6px;
-        min-height: 37px;
-        margin: 3px 0;
-        color: #263832;
-      }
+    .buttons {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
 
-      .task p {
-        font-size: 17px;
-        overflow-wrap: anywhere;
-        flex: 1;
-        min-width: 0;
-      }
+    .task button {
+      height: 27px;
+      width: 45px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
 
-      .task button {
-        height: 27px;
-        min-width: 45px;
-        border-radius: 3px;
-      }
+    .edit {
+      background: #52796f;
+    }
 
-      #alertMessage {
-        color: #b42318;
-        margin: 2px;
-        font-size: 13px;
-      }
+    .done {
+      background: #bc4749;
+    }
 
-      button {
-        background-color: #52796f;
-        color: #ffffff;
-        border: 1px solid #3d6258;
-        cursor: pointer;
-      }
+    .drag-handle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      min-width: 20px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #52796f;
+      font-size: 18px;
+      cursor: grab;
+      touch-action: none;
+      flex-shrink: 0;
+    }
 
-      .btns {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
+    .drag-handle:active {
+      cursor: grabbing;
+    }
 
-      .drag-handle {
-        width: 20px;
-        min-width: 20px;
-        height: 27px;
-        padding: 0;
-        background: transparent;
-        color: #52796f;
-        border: none;
-        font-size: 18px;
-        cursor: grab;
-        touch-action: none;
-        user-select: none;
-        flex-shrink: 0;
-      }
+    .task.dragging {
+      opacity: 0.45;
+    }
 
-      .drag-handle:active {
-        cursor: grabbing;
-        scale: 1;
-      }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      background: #263832;
+      color: white;
+      border-radius: 6px;
+      font-size: 14px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s;
+      z-index: 1000;
+      max-width: calc(100% - 30px);
+      text-align: center;
+    }
 
-      .task.dragging {
-        opacity: 0.4;
-      }
+    #toast.show {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
 
-      .task.drag-over {
-        border-top: 3px solid #52796f;
-      }
+<body>
+  <h1 id="head">قائمة مهامي</h1>
 
-      #toast {
-        position: fixed;
-        bottom: 15px;
-        right: 50%;
-        transform: translateX(50%) translateY(15px);
-        max-width: calc(100% - 30px);
-        width: max-content;
-        padding: 10px 15px;
-        border-radius: 8px;
-        background: #263832;
-        color: #fff;
-        font-size: 14px;
-        opacity: 0;
-        visibility: hidden;
-        transition: 0.25s;
-        z-index: 1000;
-        overflow-wrap: anywhere;
-      }
+  <div id="inputs">
+    <input type="text" id="newT" placeholder="اكتب المهمة">
+    <button id="enter">Enter</button>
+  </div>
 
-      #toast.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(50%) translateY(0);
-      }
+  <div id="All"></div>
 
-      @media (max-width: 380px) {
-        .task {
-          flex-wrap: wrap;
-        }
-      }
-    </style>
-  </head>
+  <div id="toast" role="status" aria-live="polite"></div>
 
-  <body>
-    <h2 id="head">قائمة المهام</h2>
-    <hr />
+  <script>
+    const newT = document.getElementById("newT");
+    const enter = document.getElementById("enter");
+    const All = document.getElementById("All");
+    const toast = document.getElementById("toast");
 
-    <div id="inputs">
-      <label for="name">ادخل اسم المهمة</label><br />
-      <small id="alertMessage"></small><br />
-      <input type="text" id="name" placeholder="اسم المهمة" />
-      <button id="enter" type="button">Enter</button>
-    </div>
+    let dataBase = [];
+    let toastTimer;
 
-    <p id="current">المهام الحالية</p>
-    <div id="outputs"></div>
-    <div id="toast" role="status" aria-live="polite"></div>
+    // قراءة المهام القديمة من localStorage
+    try {
+      const savedData = JSON.parse(localStorage.getItem("dataBase"));
 
-    <script>
-      const newT = document.getElementById("name");
-      const enter = document.getElementById("enter");
-      const All = document.getElementById("outputs");
-      const alertMessage = document.getElementById("alertMessage");
-      const toast = document.getElementById("toast");
-
-      let mode = "add";
-      let editingId = null;
-      let toastTimer;
-
-      // إنشاء معرف فريد لكل مهمة
-      function makeId() {
-        return Date.now().toString(36) + Math.random().toString(36).slice(2);
-      }
-
-      // تحميل البيانات القديمة والجديدة
-      function loadData() {
-        try {
-          const saved = localStorage.getItem("dataBase");
-
-          if (saved === null) return [];
-
-          const parsed = JSON.parse(saved);
-
-          if (!Array.isArray(parsed)) return [];
-
-          const tasks = [];
-          const ids = new Set();
-
-          for (const item of parsed) {
-            let task;
-
-            if (typeof item === "string") {
-              task = {
-                id: makeId(),
-                title: item,
+      if (Array.isArray(savedData)) {
+        dataBase = savedData
+          .map((task, index) => {
+            // دعم البيانات القديمة التي كانت نصوصًا
+            if (typeof task === "string") {
+              return {
+                id: `${Date.now()}-${index}`,
+                title: task
               };
-            } else if (
-              item &&
-              typeof item === "object" &&
-              !Array.isArray(item) &&
-              typeof item.title === "string"
+            }
+
+            if (
+              task &&
+              typeof task.title === "string"
             ) {
-              task = {
-                id:
-                  typeof item.id === "string" && item.id.length > 0
-                    ? item.id
-                    : makeId(),
-                title: item.title,
+              return {
+                id: task.id ?? `${Date.now()}-${index}`,
+                title: task.title
               };
-            } else {
-              continue;
             }
 
-            if (ids.has(task.id)) {
-              task.id = makeId();
-            }
+            return null;
+          })
+          .filter(Boolean);
+      }
+    } catch (error) {
+      dataBase = [];
+    }
 
-            ids.add(task.id);
-            tasks.push(task);
-          }
+    function saveData() {
+      localStorage.setItem("dataBase", JSON.stringify(dataBase));
+    }
 
-          return tasks;
-        } catch (error) {
-          console.error("Failed to load tasks:", error);
-          return [];
-        }
+    function showToast(message) {
+      clearTimeout(toastTimer);
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+
+    function addTask() {
+      const title = newT.value.trim();
+
+      if (title === "") {
+        return;
       }
 
-      let data = loadData();
+      dataBase.push({
+        id: `${Date.now()}-${Math.random()}`,
+        title: title
+      });
 
-      // حفظ البيانات
-      function saveData() {
-        try {
-          localStorage.setItem("dataBase", JSON.stringify(data));
-          return true;
-        } catch (error) {
-          console.error("Failed to save tasks:", error);
-          showToast("Failed to save tasks");
-          return false;
-        }
+      saveData();
+      show();
+      newT.value = "";
+      newT.focus();
+    }
+
+    enter.addEventListener("click", addTask);
+
+    newT.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    });
+
+    function editTask(id) {
+      const task = dataBase.find(item => item.id === id);
+
+      if (!task) {
+        return;
       }
 
-      // إشعار انتهاء المهمة
-      function showToast(title) {
-        clearTimeout(toastTimer);
+      const updatedTitle = prompt("Edit task:", task.title);
 
-        toast.textContent = `✓ ${title}`;
-        toast.classList.add("show");
-
-        toastTimer = setTimeout(function () {
-          toast.classList.remove("show");
-        }, 3000);
+      if (updatedTitle === null) {
+        return;
       }
 
-      // إضافة أو تعديل مهمة
-      function addOrEdit() {
-        const title = newT.value.trim();
+      const cleanedTitle = updatedTitle.trim();
 
-        if (title === "") {
-          newT.style.border = "#B42318 solid 2px";
-          alertMessage.textContent = "required field";
+      if (cleanedTitle === "") {
+        return;
+      }
+
+      task.title = cleanedTitle;
+
+      saveData();
+      show();
+    }
+
+    function deleteTask(id) {
+      const task = dataBase.find(item => item.id === id);
+
+      if (!task) {
+        return;
+      }
+
+      const completedTitle = task.title;
+
+      dataBase = dataBase.filter(item => item.id !== id);
+
+      saveData();
+      show();
+
+      showToast(`تم حذف المهمة: ${completedTitle}`);
+    }
+
+    function show() {
+      All.replaceChildren();
+
+      dataBase.forEach(task => {
+        const row = document.createElement("div");
+        row.className = "task";
+        row.dataset.id = task.id;
+
+        const handle = document.createElement("button");
+        handle.className = "drag-handle";
+        handle.type = "button";
+        handle.textContent = "⋮⋮";
+        handle.setAttribute("aria-label", "تغيير مكان المهمة");
+
+        const text = document.createElement("p");
+        text.textContent = task.title;
+
+        const buttons = document.createElement("div");
+        buttons.className = "buttons";
+
+        const editButton = document.createElement("button");
+        editButton.className = "edit";
+        editButton.textContent = "edit";
+        editButton.type = "button";
+
+        editButton.addEventListener("click", () => {
+          editTask(task.id);
+        });
+
+        const doneButton = document.createElement("button");
+        doneButton.className = "done";
+        doneButton.textContent = "done";
+        doneButton.type = "button";
+
+        doneButton.addEventListener("click", () => {
+          deleteTask(task.id);
+        });
+
+        buttons.append(editButton, doneButton);
+
+        // في اتجاه RTL يظهر مقبض السحب قبل اسم المهمة
+        row.append(handle, text, buttons);
+
+        All.appendChild(row);
+
+        setupDragging(handle, row);
+      });
+    }
+
+    function setupDragging(handle, row) {
+      handle.addEventListener("pointerdown", event => {
+        if (event.button !== 0 && event.pointerType === "mouse") {
           return;
         }
 
-        if (mode === "add") {
-          data.push({
-            id: makeId(),
-            title: title,
-          });
-        } else {
-          const index = data.findIndex(function (task) {
-            return task.id === editingId;
-          });
+        event.preventDefault();
 
-          if (index === -1) {
-            resetForm();
-            show();
+        const startY = event.clientY;
+        let dragging = false;
+
+        const originalRows = [...All.querySelectorAll(".task")];
+
+        function onMove(moveEvent) {
+          const distance = Math.abs(moveEvent.clientY - startY);
+
+          if (!dragging && distance < 5) {
             return;
           }
 
-          data[index].title = title;
-        }
-
-        if (saveData()) {
-          resetForm();
-        }
-
-        show();
-      }
-
-      enter.addEventListener("click", addOrEdit);
-
-      newT.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-          addOrEdit();
-        }
-      });
-
-      newT.addEventListener("input", function () {
-        newT.style.border = "none";
-        alertMessage.textContent = "";
-      });
-
-      // إعادة وضع الإضافة بعد الحفظ
-      function resetForm() {
-        newT.value = "";
-        editingId = null;
-        mode = "add";
-        enter.textContent = "Enter";
-        alertMessage.textContent = "";
-        newT.style.border = "none";
-      }
-
-      // تعديل مهمة
-      function editTask(id) {
-        const task = data.find(function (item) {
-          return item.id === id;
-        });
-
-        if (!task) return;
-
-        newT.value = task.title;
-        editingId = id;
-        mode = "edit";
-        enter.textContent = "edit";
-
-        window.scrollTo(0, 0);
-        newT.focus();
-      }
-
-      // حذف المهمة عند الضغط على done
-      function deleteTask(id) {
-        const index = data.findIndex(function (task) {
-          return task.id === id;
-        });
-
-        if (index === -1) return;
-
-        const completedTitle = data[index].title;
-
-        data.splice(index, 1);
-
-        if (editingId === id) {
-          resetForm();
-        }
-
-        if (saveData()) {
-          showToast(`تم انهاء المهمة: ${completedTitle}`);
-        }
-
-        show();
-      }
-
-      // عرض المهام بطريقة آمنة
-      function show() {
-        All.replaceChildren();
-
-        data.forEach(function (task, index) {
-          const row = document.createElement("div");
-          row.className = "task";
-          row.dataset.id = task.id;
-
-          const text = document.createElement("p");
-          text.textContent = task.title;
-
-          const buttons = document.createElement("div");
-          buttons.className = "btns";
-
-          // علامة سحب لترتيب المهام
-          const handle = document.createElement("button");
-          handle.type = "button";
-          handle.className = "drag-handle";
-          handle.textContent = "⋮⋮";
-          handle.title = "Reorder";
-          handle.setAttribute("aria-label", "Reorder task");
-
-          // زر التعديل
-          const editButton = document.createElement("button");
-          editButton.type = "button";
-          editButton.textContent = "edit";
-
-          editButton.addEventListener("click", function () {
-            editTask(task.id);
-          });
-
-          // زر إكمال المهمة وحذفها
-          const doneButton = document.createElement("button");
-          doneButton.type = "button";
-          doneButton.textContent = "done";
-
-          doneButton.addEventListener("click", function () {
-            deleteTask(task.id);
-          });
-
-          buttons.append(editButton, doneButton);
-          row.append(handle, text, buttons);
-          All.appendChild(row);
-
-          setupDragging(row, handle);
-        });
-      }
-
-      // السحب بالماوس أو اللمس باستخدام Pointer Events
-      let dragState = null;
-
-      function setupDragging(row, handle) {
-        handle.addEventListener("pointerdown", function (event) {
-          if (event.button !== 0 && event.pointerType === "mouse") {
-            return;
+          if (!dragging) {
+            dragging = true;
+            row.classList.add("dragging");
           }
 
-          event.preventDefault();
+          const otherRows = [...All.querySelectorAll(".task:not(.dragging)")];
 
-          const rows = [...All.querySelectorAll(".task")];
+          let closestRow = null;
+          let closestDistance = Number.NEGATIVE_INFINITY;
 
-          dragState = {
-            row: row,
-            startY: event.clientY,
-            lastY: event.clientY,
-            moved: false,
-          };
+          otherRows.forEach(otherRow => {
+            const rect = otherRow.getBoundingClientRect();
+            const offset = moveEvent.clientY - (rect.top + rect.height / 2);
 
-          row.classList.add("dragging");
-
-          try {
-            handle.setPointerCapture(event.pointerId);
-          } catch (error) {}
-
-          function onMove(e) {
-            if (!dragState || dragState.row !== row) return;
-
-            dragState.lastY = e.clientY;
-
-            if (Math.abs(e.clientY - dragState.startY) > 5) {
-              dragState.moved = true;
+            if (
+              (offset < 0 && offset > closestDistance)
+            ) {
+              closestDistance = offset;
+              closestRow = otherRow;
             }
+          });
 
-            if (!dragState.moved) return;
+          if (closestRow) {
+            All.insertBefore(row, closestRow);
+          } else {
+            All.appendChild(row);
+          }
+        }
 
-            const siblings = [...All.querySelectorAll(".task:not(.dragging)")];
+        function onUp() {
+          document.removeEventListener("pointermove", onMove);
+          document.removeEventListener("pointerup", onUp);
+          document.removeEventListener("pointercancel", onUp);
 
-            let target = null;
+          row.classList.remove("dragging");
 
-            for (const sibling of siblings) {
-              const rect = sibling.getBoundingClientRect();
-              const midpoint = rect.top + rect.height / 2;
+          if (dragging) {
+            const newOrder = [...All.querySelectorAll(".task")]
+              .map(item => item.dataset.id);
 
-              if (e.clientY < midpoint) {
-                target = sibling;
-                break;
-              }
-            }
-
-            All.querySelectorAll(".drag-over").forEach(function (item) {
-              item.classList.remove("drag-over");
+            dataBase.sort((a, b) => {
+              return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
             });
 
-            if (target) {
-              target.classList.add("drag-over");
-              All.insertBefore(row, target);
-            } else {
-              All.appendChild(row);
-            }
+            saveData();
           }
+        }
 
-          function onUp() {
-            if (!dragState || dragState.row !== row) return;
+        document.addEventListener("pointermove", onMove);
+        document.addEventListener("pointerup", onUp);
+        document.addEventListener("pointercancel", onUp);
+      });
+    }
 
-            row.classList.remove("dragging");
+    show();
 
-            All.querySelectorAll(".drag-over").forEach(function (item) {
-              item.classList.remove("drag-over");
-            });
-
-            if (dragState.moved) {
-              const orderedIds = [...All.querySelectorAll(".task")].map(
-                function (item) {
-                  return item.dataset.id;
-                },
-              );
-
-              const reordered = orderedIds
-                .map(function (id) {
-                  return data.find(function (task) {
-                    return task.id === id;
-                  });
-                })
-                .filter(Boolean);
-
-              data = reordered;
-              saveData();
-            }
-
-            dragState = null;
-
-            window.removeEventListener("pointermove", onMove);
-            window.removeEventListener("pointerup", onUp);
-            window.removeEventListener("pointercancel", onUp);
-          }
-
-          window.addEventListener("pointermove", onMove);
-          window.addEventListener("pointerup", onUp);
-          window.addEventListener("pointercancel", onUp);
-        });
-      }
-
-      // بدء التطبيق
-      show();
-
-      // تسجيل Service Worker
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker.register("./sw.js").catch(function (error) {
-            console.error("Service Worker error:", error);
+    // تسجيل Service Worker لتشغيل الموقع كتطبيق PWA
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js")
+          .catch(error => {
+            console.error("Service Worker registration failed:", error);
           });
-        });
-      }
-    </script>
-  </body>
-</html>
+      });
+    }
+  </script>
+</body>
+  </html>
